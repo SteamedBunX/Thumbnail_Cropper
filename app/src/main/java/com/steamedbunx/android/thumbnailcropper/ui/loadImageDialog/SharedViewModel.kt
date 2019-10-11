@@ -1,22 +1,24 @@
 package com.steamedbunx.android.thumbnailcropper.ui.loadImageDialog
 
+import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.steamedbunx.android.thumbnailcropper.R
 
-class SharedViewModel(context: Context):ViewModel(){
+class SharedViewModel(application: Application): AndroidViewModel(application){
 
     // the place holder image
     val placeHolderImage: Bitmap
 
     init{
         // load the placeholder
-        var drawable = context.getDrawable(R.drawable.place_holder) as BitmapDrawable
+        var drawable = application.applicationContext.getDrawable(R.drawable.place_holder) as BitmapDrawable
         placeHolderImage = drawable.bitmap
         // put the placeholder onto display
         resetImageToPlaceHolder()

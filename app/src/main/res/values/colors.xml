@@ -7,4 +7,6 @@
     <color name="colorAppBar">#212121</color>
     <color name="colorBackground">#303030</color>
     <color name="colorDialogAndCard">#424242</color>
+    <color name="colorTextPrimary">#FFFFFF</color>
+    <color name="colorButtonPrimary">#212121</color>
 </resources>

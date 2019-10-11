@@ -7,6 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.steamedbunx.android.thumbnailcropper.R
+import com.steamedbunx.android.thumbnailcropper.ui.loadImageDialog.LoadImageDialogFragment
+import kotlinx.android.synthetic.main.main_fragment.*
 
 class MainFragment : Fragment() {
 
@@ -26,7 +28,13 @@ class MainFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
+        button_load_new_image.setOnClickListener { showLoadImageDialog() }
         // TODO: Use the ViewModel
+    }
+
+    fun showLoadImageDialog(){
+        val dialog = LoadImageDialogFragment.newInstance()
+        dialog.show(requireFragmentManager(), "load_image_dialog_fragment")
     }
 
 }

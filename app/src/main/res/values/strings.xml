@@ -3,4 +3,7 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="load_crop"><![CDATA[Load & Crop]]></string>
+    <string name="store_image">Store Image</string>
+    <string name="image_view_description_load_dialog">placeholder image or the currently loaded image</string>
 </resources>
