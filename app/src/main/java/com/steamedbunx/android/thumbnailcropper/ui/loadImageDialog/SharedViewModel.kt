@@ -14,15 +14,6 @@ import com.steamedbunx.android.thumbnailcropper.R
 class SharedViewModel(application: Application): AndroidViewModel(application){
 
     // the place holder image
-    val placeHolderImage: Bitmap
-
-    init{
-        // load the placeholder
-        var drawable = application.applicationContext.getDrawable(R.drawable.place_holder) as BitmapDrawable
-        placeHolderImage = drawable.bitmap
-        // put the placeholder onto display
-        resetImageToPlaceHolder()
-    }
 
     // region LiveData
     // the Uri of the newly stored image
@@ -50,7 +41,7 @@ class SharedViewModel(application: Application): AndroidViewModel(application){
     }
 
     fun resetImageToPlaceHolder(){
-        _imageLoaded.value = placeHolderImage
+
     }
 
     // endregion
