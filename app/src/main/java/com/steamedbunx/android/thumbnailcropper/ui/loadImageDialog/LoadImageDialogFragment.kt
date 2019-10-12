@@ -5,7 +5,6 @@ import android.app.Activity
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Bundle
@@ -18,16 +17,19 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.google.android.material.snackbar.Snackbar
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.listener.single.DialogOnDeniedPermissionListener
 
 import com.steamedbunx.android.thumbnailcropper.R
-import com.steamedbunx.android.thumbnailcropper.REQUESTCODE_CAMERA
-import com.steamedbunx.android.thumbnailcropper.REQUESTCODE_GALLERY
+import com.steamedbunx.android.thumbnailcropper.REQUESTCODE_PICK_IMAGE
 import com.steamedbunx.android.thumbnailcropper.databinding.LoadImageDialogFragmentBinding
 import com.steamedbunx.android.thumbnailcropper.ui.main.MainViewModel
 import com.steamedbunx.android.thumbnailcropper.ui.main.MainViewModelFactory
-import kotlinx.android.synthetic.main.load_image_dialog_fragment.*
+import com.theartofdev.edmodo.cropper.CropImage
+import com.theartofdev.edmodo.cropper.CropImage.getPickImageChooserIntent
+import com.theartofdev.edmodo.cropper.CropImage.getPickImageResultUri
+import com.theartofdev.edmodo.cropper.CropImageView
 import java.io.File
 
 class LoadImageDialogFragment : DialogFragment() {
@@ -39,73 +41,82 @@ class LoadImageDialogFragment : DialogFragment() {
     }
 
     private lateinit var binding: LoadImageDialogFragmentBinding
-    lateinit var sharedViewModel:SharedViewModel
+    lateinit var viewModel: LoadImageDialogViewModel
+    lateinit var mainViewModel: MainViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = DataBindingUtil.inflate(inflater, R.layout.load_image_dialog_fragment, container, true)
+        binding =
+            DataBindingUtil.inflate(
+                inflater, R.layout.load_image_dialog_fragment, container, true)
         return binding.root
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         // initialize the viewModels
-        val viewModelFactory = MainViewModelFactory(requireActivity().application)
-        sharedViewModel = requireActivity().run {
-            ViewModelProviders.of(this, viewModelFactory).get(SharedViewModel::class.java)
+        val viewModelFactory = MainViewModelFactory()
+        viewModel =
+            ViewModelProviders.of(this, viewModelFactory).get(LoadImageDialogViewModel::class.java)
+        viewModel.resetImageToPlaceHolder()
+        mainViewModel = requireActivity().run {
+            ViewModelProviders.of(this, viewModelFactory).get(MainViewModel::class.java)
         }
-        sharedViewModel.resetImageToPlaceHolder()
+
         // observer
-        sharedViewModel.imageLoaded.observe(this, Observer {
+        viewModel.imageLoaded.observe(this, Observer {
             setDisplayImage()
         })
         // onClickListeners
-        binding.buttonFromCamera.setOnClickListener { loadFromCamera() }
-        binding.buttonFromGallery.setOnClickListener { loadFromGallery() }
+        binding.buttonLoadImage.setOnClickListener { loadImageOnClick() }
+        binding.buttonStoreImage.setOnClickListener { storeImageOnClick() }
     }
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
-        sharedViewModel.resetImageToPlaceHolder()
+        viewModel.resetImageToPlaceHolder()
     }
 
     // region LiveDataObservers
     // refresh the the image display.
-    private fun setDisplayImage(){
-        if(sharedViewModel.isImageNewlyLoaded.value == true && sharedViewModel.imageLoaded.value != null){
-            binding.imageViewDialogFragment.setImageBitmap(sharedViewModel.imageLoaded.value)
-        }else{
+    private fun setDisplayImage() {
+        if (viewModel.isImageNewlyLoaded.value == true && viewModel.imageLoaded.value != null) {
+            binding.imageViewDialogFragment.setImageBitmap(viewModel.imageLoaded.value)
+        } else {
             binding.imageViewDialogFragment.setImageResource(R.drawable.place_holder)
         }
     }
     // endregion
 
     // region OnClickListeners
-    fun loadFromGallery(){
+    fun storeImageOnClick() {
         askStoragePermission()
         if (checkStoragePermission()) {
-            lunchGalleryIntent()
+            storeImage()
         }
     }
 
-    fun loadFromCamera(){
-        askCameraPermission()
-        if (checkCameraPermission()) {
-            lunchCameraIntent()
+    fun loadImageOnClick() {
+        askPermissions()
+        if (checkPermissions()) {
+            lunchImagePickingIntent()
         }
     }
 
-    fun requestPermissions(){
-        askStoragePermission()
-        if (checkStoragePermission()) {
-            lunchGalleryIntent()
-        }
-    }
     // endregion
 
     // region Permission And Loading
+    fun askPermissions() {
+        askCameraPermission()
+        askStoragePermission()
+    }
+
+    fun checkPermissions(): Boolean {
+        return (checkCameraPermission() && checkStoragePermission())
+    }
+
     fun askCameraPermission() {
         val dialogPermissionListener = DialogOnDeniedPermissionListener.Builder
             .withContext(requireContext())
@@ -124,14 +135,6 @@ class LoadImageDialogFragment : DialogFragment() {
             requireContext(),
             Manifest.permission.CAMERA
         ) == PackageManager.PERMISSION_GRANTED
-    }
-
-    fun lunchCameraIntent() {
-//        Snackbar.make(requireView(), "Camera Intent Lunch here", Snackbar.LENGTH_LONG).show()
-        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        if (intent.resolveActivity(requireActivity().packageManager) != null) {
-            startActivityForResult(intent, REQUESTCODE_CAMERA)
-        }
     }
 
     fun askStoragePermission() {
@@ -154,44 +157,61 @@ class LoadImageDialogFragment : DialogFragment() {
         ) == PackageManager.PERMISSION_GRANTED
     }
 
-    fun lunchGalleryIntent() {
-//        Snackbar.make(requireView(), "Gallery Intent Lunch here", Snackbar.LENGTH_LONG).show()
-        val intent = Intent(Intent.ACTION_GET_CONTENT)
-        intent.type = "image/*"
-        intent.addCategory(Intent.CATEGORY_OPENABLE)
-        if (intent.resolveActivity(requireActivity().packageManager) != null) {
-            startActivityForResult(intent, REQUESTCODE_GALLERY)
-        }
+    fun lunchImagePickingIntent() {
+        startActivityForResult(getPickImageChooserIntent(requireContext()), REQUESTCODE_PICK_IMAGE);
     }
+
     // endregion
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
-                REQUESTCODE_CAMERA -> updateBitmapFromCamera(data?.extras?.get("data") as Bitmap)
-                REQUESTCODE_GALLERY -> updateBitmapFromGallery(data?.data as Uri)
+                REQUESTCODE_PICK_IMAGE -> lunchImageCrop(
+                    getPickImageResultUri(
+                        requireContext(),
+                        data
+                    )
+                )
+                CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE -> {
+                    val result = CropImage.getActivityResult(data)
+                    updateBitmapFromUri(result.uri)
+                }
                 else -> return
             }
         }
     }
 
-    fun updateBitmapFromCamera(newBitmap: Bitmap?) {
-        if (newBitmap != null) {
-            sharedViewModel.setImageBitmap(newBitmap)
-        }
-    }
-
-    fun updateBitmapFromGallery(newImageUri: Uri) {
+    fun updateBitmapFromUri(newImageUri: Uri) {
         if (newImageUri != null) {
+            viewModel.storeImageUri(newImageUri)
             if (android.os.Build.VERSION.SDK_INT >= 29) {
                 var bitmap =
                     ImageDecoder.decodeBitmap(ImageDecoder.createSource(File(newImageUri.path)))
-                sharedViewModel.setImageBitmap(bitmap)
+                viewModel.loadImage(bitmap)
             } else {
                 var bitmap =
                     MediaStore.Images.Media.getBitmap(requireContext().contentResolver, newImageUri)
-                sharedViewModel.setImageBitmap(bitmap)
+                viewModel.loadImage(bitmap)
             }
         }
+    }
+
+    fun lunchImageCrop(uri: Uri) {
+        CropImage.activity(uri)
+            .setGuidelines(CropImageView.Guidelines.ON)
+            .setAspectRatio(300, 300)
+            .start(requireContext(), this)
+    }
+
+    fun storeImage() {
+        if (viewModel.isImageNewlyLoaded.value == true) {
+            val uri = viewModel.imageStored.value
+            if (uri != null) {
+                mainViewModel.setCurrentDisplayedImageUri(uri)
+            }
+            this.dismiss()
+        }
+        val directory = requireContext().filesDir
+        directory.listFiles()
     }
 }

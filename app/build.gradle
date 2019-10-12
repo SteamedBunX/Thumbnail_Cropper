@@ -41,6 +41,9 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
+    // Image Cropper
+    api 'com.theartofdev.edmodo:android-image-cropper:2.8.+'
+
     // Dexter for easy permission request
     implementation 'com.karumi:dexter:6.0.0'
 

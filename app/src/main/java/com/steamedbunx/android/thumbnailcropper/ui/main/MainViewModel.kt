@@ -9,15 +9,16 @@ class MainViewModel : ViewModel() {
 
     // region LiveData
     // the Uri of the image that's displayed at the top
-    val _currentImage = MutableLiveData<Uri>()
+    private val _currentImage = MutableLiveData<Uri>()
     val currentImage: LiveData<Uri>
         get() = _currentImage
 
     // the List of all images that's in the internal storage
-    // TODO: learn how to save and access files within the internal storage
 
     // endRegion
-
+    fun setCurrentDisplayedImageUri(uri: Uri){
+        _currentImage.value = uri
+    }
 
 
 

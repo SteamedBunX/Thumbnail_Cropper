@@ -10,7 +10,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/frameLayout"
         android:layout_width="350dp"
-        android:layout_height="500dp"
+        android:layout_height="454dp"
         android:layout_gravity="center"
         android:background="@color/colorDialogAndCard"
         android:minWidth="350dp"
@@ -33,48 +33,34 @@
             tools:src="@drawable/place_holder" />
 
         <Button
-            android:id="@+id/button_from_camera"
+            android:id="@+id/button_load_image"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
             android:background="@color/colorAppBar"
-            android:text="@string/from_camera"
+            android:text="@string/load_image"
             android:textColor="@color/colorTextPrimary"
-            app:layout_constraintBottom_toTopOf="@+id/button_store_image"
             app:layout_constraintEnd_toStartOf="@+id/guideline2"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageView_dialog_fragment" />
-
-        <Button
-            android:id="@+id/button_from_gallery"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:background="@color/colorAppBar"
-            android:text="@string/from_gallery"
-            android:textColor="@color/colorTextPrimary"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/guideline2"
-            app:layout_constraintTop_toTopOf="@+id/button_from_camera" />
+            app:layout_constraintTop_toTopOf="@+id/button_store_image" />
 
         <Button
             android:id="@+id/button_store_image"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
+            android:layout_marginTop="20dp"
             android:layout_marginRight="20dp"
+            android:layout_marginBottom="20dp"
             android:background="@color/colorAppBar"
             android:text="@string/store_image"
             android:textColor="@color/colorTextPrimary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/button_from_camera"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintStart_toStartOf="@+id/guideline2"
+            app:layout_constraintTop_toBottomOf="@+id/imageView_dialog_fragment" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline2"
