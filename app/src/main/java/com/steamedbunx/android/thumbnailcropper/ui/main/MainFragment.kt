@@ -47,4 +47,6 @@ class MainFragment : Fragment() {
         dialog.show(requireFragmentManager(), "load_image_dialog_fragment")
     }
 
+
+
 }

@@ -1,15 +1,11 @@
 package com.steamedbunx.android.thumbnailcropper.ui.loadImageDialog
 
 import android.app.Application
-import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import com.steamedbunx.android.thumbnailcropper.R
 
 class SharedViewModel(application: Application): AndroidViewModel(application){
 
@@ -28,20 +24,37 @@ class SharedViewModel(application: Application): AndroidViewModel(application){
 
     // if the user has decided to store the current image
     // if it's true, the main fragment's current image display will update to imageStored.
-    private val _isImageNewlyStored = MutableLiveData<Boolean>()
+    private val _isImageStored = MutableLiveData<Boolean>()
     val isImageNewlyStored: LiveData<Boolean>
-        get() = _isImageNewlyStored
+        get() = _isImageStored
+
+    // if the user had performed loading at least once since this dialog was shown
+    // if it's false, the placeHolder image will be displayed instead
+    private val _isImageNewlyLoaded = MutableLiveData<Boolean>()
+    val isImageNewlyLoaded: LiveData<Boolean>
+        get() = _isImageNewlyLoaded
 
     // endregion
 
     // region function
     // store the image and set isImageNewlyLoaded to true
-    fun store(){
-        _isImageNewlyStored.value = true
+    fun load(){
+        _isImageNewlyLoaded.value = true
     }
 
-    fun resetImageToPlaceHolder(){
+    fun store(){
+        _isImageStored.value = true
+    }
 
+
+    // should be called upon dialog's dismiss
+    fun resetImageToPlaceHolder(){
+        _isImageNewlyLoaded.value = false
+    }
+
+    fun setImageBitmap(newBitmap: Bitmap) {
+        _isImageNewlyLoaded.value = true
+        _imageLoaded.value = newBitmap
     }
 
     // endregion
