@@ -2,11 +2,15 @@ package com.steamedbunx.android.thumbnailcropper.ui.loadImageDialog
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.LayoutInflater
@@ -31,6 +35,12 @@ import com.theartofdev.edmodo.cropper.CropImage.getPickImageChooserIntent
 import com.theartofdev.edmodo.cropper.CropImage.getPickImageResultUri
 import com.theartofdev.edmodo.cropper.CropImageView
 import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 class LoadImageDialogFragment : DialogFragment() {
 
@@ -50,7 +60,8 @@ class LoadImageDialogFragment : DialogFragment() {
     ): View? {
         binding =
             DataBindingUtil.inflate(
-                inflater, R.layout.load_image_dialog_fragment, container, true)
+                inflater, R.layout.load_image_dialog_fragment, container, true
+            )
         return binding.root
     }
 
@@ -184,15 +195,15 @@ class LoadImageDialogFragment : DialogFragment() {
     fun updateBitmapFromUri(newImageUri: Uri) {
         if (newImageUri != null) {
             viewModel.storeImageUri(newImageUri)
-            if (android.os.Build.VERSION.SDK_INT >= 29) {
-                var bitmap =
-                    ImageDecoder.decodeBitmap(ImageDecoder.createSource(File(newImageUri.path)))
-                viewModel.loadImage(bitmap)
-            } else {
-                var bitmap =
-                    MediaStore.Images.Media.getBitmap(requireContext().contentResolver, newImageUri)
-                viewModel.loadImage(bitmap)
-            }
+            viewModel.loadImage(getBitmapFromUri(newImageUri))
+        }
+    }
+
+    private fun getBitmapFromUri(newImageUri: Uri): Bitmap {
+        return if (Build.VERSION.SDK_INT >= 29) {
+            ImageDecoder.decodeBitmap(ImageDecoder.createSource(File(newImageUri.path)))
+        } else {
+            MediaStore.Images.Media.getBitmap(requireContext().contentResolver, newImageUri)
         }
     }
 
@@ -208,10 +219,34 @@ class LoadImageDialogFragment : DialogFragment() {
             val uri = viewModel.imageStored.value
             if (uri != null) {
                 mainViewModel.setCurrentDisplayedImageUri(uri)
+                storeImageToInternalStorage(uri)
             }
             this.dismiss()
         }
-        val directory = requireContext().filesDir
-        directory.listFiles()
+    }
+
+    private fun storeImageToInternalStorage(uri: Uri) {
+        val outputFileStream =
+            FileOutputStream(File(requireContext().filesDir, createFileName()))
+        val outputBitmap = getBitmapFromUri(uri)
+        outputBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputFileStream)
+        outputFileStream.close()
+    }
+
+    private fun createFileName(): String {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            LocalDateTime.now().toString()
+        } else {
+            getCurrentDateTime().toString("yyyy-MM-dd-HH-mm-ss")
+        }
+    }
+
+    private fun Date.toString(format: String, locale: Locale = Locale.getDefault()): String {
+        val formatter = SimpleDateFormat(format, locale)
+        return formatter.format(this)
+    }
+
+    private fun getCurrentDateTime(): Date {
+        return Calendar.getInstance().time
     }
 }
