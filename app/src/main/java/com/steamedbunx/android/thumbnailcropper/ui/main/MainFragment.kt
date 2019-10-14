@@ -64,7 +64,6 @@ class MainFragment : Fragment() {
         else{
             binding.imageView.setImageResource(R.drawable.place_holder)
         }
-
     }
 
 

@@ -28,6 +28,7 @@ import com.karumi.dexter.listener.single.DialogOnDeniedPermissionListener
 import com.steamedbunx.android.thumbnailcropper.R
 import com.steamedbunx.android.thumbnailcropper.REQUESTCODE_PICK_IMAGE
 import com.steamedbunx.android.thumbnailcropper.databinding.LoadImageDialogFragmentBinding
+import com.steamedbunx.android.thumbnailcropper.ui.Util
 import com.steamedbunx.android.thumbnailcropper.ui.main.MainViewModel
 import com.steamedbunx.android.thumbnailcropper.ui.main.MainViewModelFactory
 import com.theartofdev.edmodo.cropper.CropImage
@@ -53,6 +54,7 @@ class LoadImageDialogFragment : DialogFragment() {
     private lateinit var binding: LoadImageDialogFragmentBinding
     lateinit var viewModel: LoadImageDialogViewModel
     lateinit var mainViewModel: MainViewModel
+    lateinit var util:Util
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -67,6 +69,7 @@ class LoadImageDialogFragment : DialogFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        util = Util.getInstence()
         // initialize the viewModels
         val viewModelFactory = MainViewModelFactory()
         viewModel =
@@ -195,15 +198,7 @@ class LoadImageDialogFragment : DialogFragment() {
     fun updateBitmapFromUri(newImageUri: Uri) {
         if (newImageUri != null) {
             viewModel.storeImageUri(newImageUri)
-            viewModel.loadImage(getBitmapFromUri(newImageUri))
-        }
-    }
-
-    private fun getBitmapFromUri(newImageUri: Uri): Bitmap {
-        return if (Build.VERSION.SDK_INT >= 29) {
-            ImageDecoder.decodeBitmap(ImageDecoder.createSource(File(newImageUri.path)))
-        } else {
-            MediaStore.Images.Media.getBitmap(requireContext().contentResolver, newImageUri)
+            viewModel.loadImage(util.getBitmapFromUri(newImageUri, requireContext()))
         }
     }
 
@@ -219,34 +214,9 @@ class LoadImageDialogFragment : DialogFragment() {
             val uri = viewModel.imageStored.value
             if (uri != null) {
                 mainViewModel.setCurrentDisplayedImageUri(uri)
-                storeImageToInternalStorage(uri)
+                util.storeImageToInternalStorage(uri, requireContext())
             }
             this.dismiss()
         }
-    }
-
-    private fun storeImageToInternalStorage(uri: Uri) {
-        val outputFileStream =
-            FileOutputStream(File(requireContext().filesDir, createFileName()))
-        val outputBitmap = getBitmapFromUri(uri)
-        outputBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputFileStream)
-        outputFileStream.close()
-    }
-
-    private fun createFileName(): String {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            LocalDateTime.now().toString()
-        } else {
-            getCurrentDateTime().toString("yyyy-MM-dd-HH-mm-ss")
-        }
-    }
-
-    private fun Date.toString(format: String, locale: Locale = Locale.getDefault()): String {
-        val formatter = SimpleDateFormat(format, locale)
-        return formatter.format(this)
-    }
-
-    private fun getCurrentDateTime(): Date {
-        return Calendar.getInstance().time
     }
 }
