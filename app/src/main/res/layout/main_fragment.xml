@@ -17,6 +17,9 @@
             android:id="@+id/imageView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_margin="4dp"
+            android:background="@color/colorDialogAndCard"
+            android:contentDescription="@string/image_view_description_load_dialog"
             android:padding="40dp"
             app:layout_constraintDimensionRatio="1"
             app:layout_constraintEnd_toEndOf="parent"
@@ -46,24 +49,15 @@
             android:orientation="horizontal"
             app:layout_constraintGuide_percent="0.80" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_margin="4dp"
+            android:background="@color/colorButtonPrimary"
             android:foregroundGravity="center"
+            android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/guideline">
-
-            <TextView
-                android:id="@+id/textView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="PlaceHolder"
-                android:textSize="36sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            app:layout_constraintTop_toTopOf="@+id/guideline" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
