@@ -105,14 +105,14 @@ class LoadImageDialogFragment : DialogFragment() {
     // endregion
 
     // region OnClickListeners
-    fun storeImageOnClick() {
+    private fun storeImageOnClick() {
         askStoragePermission()
         if (checkStoragePermission()) {
             storeImage()
         }
     }
 
-    fun loadImageOnClick() {
+    private fun loadImageOnClick() {
         askPermissions()
         if (checkPermissions()) {
             lunchImagePickingIntent()
@@ -122,16 +122,16 @@ class LoadImageDialogFragment : DialogFragment() {
     // endregion
 
     // region Permission And Loading
-    fun askPermissions() {
+    private fun askPermissions() {
         askCameraPermission()
         askStoragePermission()
     }
 
-    fun checkPermissions(): Boolean {
+    private fun checkPermissions(): Boolean {
         return (checkCameraPermission() && checkStoragePermission())
     }
 
-    fun askCameraPermission() {
+    private fun askCameraPermission() {
         val dialogPermissionListener = DialogOnDeniedPermissionListener.Builder
             .withContext(requireContext())
             .withTitle("Camera permission")
@@ -144,14 +144,14 @@ class LoadImageDialogFragment : DialogFragment() {
             .check()
     }
 
-    fun checkCameraPermission(): Boolean {
+    private fun checkCameraPermission(): Boolean {
         return ActivityCompat.checkSelfPermission(
             requireContext(),
             Manifest.permission.CAMERA
         ) == PackageManager.PERMISSION_GRANTED
     }
 
-    fun askStoragePermission() {
+    private fun askStoragePermission() {
         val dialogPermissionListener = DialogOnDeniedPermissionListener.Builder
             .withContext(requireContext())
             .withTitle("Read Storage permission")
@@ -164,7 +164,7 @@ class LoadImageDialogFragment : DialogFragment() {
             .check()
     }
 
-    fun checkStoragePermission(): Boolean {
+    private fun checkStoragePermission(): Boolean {
         return ActivityCompat.checkSelfPermission(
             requireContext(),
             Manifest.permission.READ_EXTERNAL_STORAGE
@@ -195,7 +195,7 @@ class LoadImageDialogFragment : DialogFragment() {
         }
     }
 
-    fun updateBitmapFromUri(newImageUri: Uri) {
+    private fun updateBitmapFromUri(newImageUri: Uri?) {
         if (newImageUri != null) {
             viewModel.storeImageUri(newImageUri)
             viewModel.loadImage(util.getBitmapFromUri(newImageUri, requireContext()))
@@ -213,8 +213,11 @@ class LoadImageDialogFragment : DialogFragment() {
         if (viewModel.isImageNewlyLoaded.value == true) {
             val uri = viewModel.imageStored.value
             if (uri != null) {
-                mainViewModel.setCurrentDisplayedImageUri(uri)
-                util.storeImageToInternalStorage(uri, requireContext())
+                // using the util to store the image, and get the Uri of the newly stored image file
+                val newUri = util.storeImageToInternalStorage(uri, requireContext())
+                // update the image uri in the main view to this croped image
+                mainViewModel.setCurrentDisplayedImageUri(newUri)
+                mainViewModel.updateImageList(requireContext())
             }
             this.dismiss()
         }

@@ -8,11 +8,13 @@ import android.os.Build
 import android.provider.MediaStore
 import com.steamedbunx.android.thumbnailcropper.ui.main.ImageModel
 import java.io.File
+import java.io.FileFilter
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.util.*
 
+@Suppress("DEPRECATION")
 class Util private constructor() {
     companion object {
         private val instance = Util()
@@ -22,16 +24,28 @@ class Util private constructor() {
         }
     }
 
-    fun loadImageFromInternalStorage(): List<ImageModel> {
-        return emptyList()
+    fun loadAllPngUriFromInternalStorage(context: Context): List<Uri> {
+        val root = context.filesDir
+        // get only the PNG files via  filter
+        val pngFilter = object: FileFilter{
+            override fun accept(pathname: File?): Boolean {
+                //return (pathname?.path?.endsWith(".png") == true)
+                return true
+            }
+        }
+        // get Uri out of the files
+        return root.listFiles(pngFilter).
+            mapNotNull{ if(it!=null) Uri.fromFile(it) else null}
     }
 
-    fun storeImageToInternalStorage(uri: Uri, context: Context) {
+    fun storeImageToInternalStorage(uri: Uri, context: Context) : Uri{
+        val file = File(context.filesDir, createFileName())
         val outputFileStream =
-            FileOutputStream(File(context.filesDir, createFileName()))
+            FileOutputStream(file)
         val outputBitmap = getBitmapFromUri(uri, context)
         outputBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputFileStream)
         outputFileStream.close()
+        return Uri.fromFile(file)
     }
 
     private fun createFileName(): String {
@@ -53,7 +67,7 @@ class Util private constructor() {
 
     fun getBitmapFromUri(uri: Uri, context: Context): Bitmap {
         return if (Build.VERSION.SDK_INT >= 29) {
-            ImageDecoder.decodeBitmap(ImageDecoder.createSource(File(uri.path)))
+            ImageDecoder.decodeBitmap(ImageDecoder.createSource(File(uri.path?:"")))
         } else {
             MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
         }
