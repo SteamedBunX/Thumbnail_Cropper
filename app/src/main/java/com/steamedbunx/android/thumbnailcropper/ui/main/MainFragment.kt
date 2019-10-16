@@ -82,7 +82,6 @@ class MainFragment : Fragment() {
             it?.let {
                 adapter.submitList(it)
                 adapter.notifyDataSetChanged()
-                Snackbar.make(requireView(), "Adaptor Update", Snackbar.LENGTH_LONG).show()
             }
         })
 
@@ -92,6 +91,7 @@ class MainFragment : Fragment() {
             askSavePermission()
             if (checkSavePermission()) {
                 viewModel.storeImageToGallery(requireContext())
+                Snackbar.make(requireView(), "Image Saved ", Snackbar.LENGTH_LONG).show()
             }
         }
         displayCurrentSelection(viewModel.currentImage.value)
