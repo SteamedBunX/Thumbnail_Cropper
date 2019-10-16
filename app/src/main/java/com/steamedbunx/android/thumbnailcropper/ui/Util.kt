@@ -6,6 +6,7 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import androidx.core.net.toFile
 import com.steamedbunx.android.thumbnailcropper.ui.main.ImageModel
 import java.io.File
 import java.io.FileFilter
@@ -50,9 +51,9 @@ class Util private constructor() {
 
     private fun createFileName(): String {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            LocalDateTime.now().toString()
+            LocalDateTime.now().toString() + ".png"
         } else {
-            getCurrentDateTime().toString("yyyy-MM-dd-HH-mm-ss")
+            getCurrentDateTime().toString("yyyy-MM-dd-HH-mm-ss") + ".png"
         }
     }
 
@@ -71,5 +72,9 @@ class Util private constructor() {
         } else {
             MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
         }
+    }
+
+    fun deleteImage(uri: Uri){
+        uri.toFile().delete()
     }
 }

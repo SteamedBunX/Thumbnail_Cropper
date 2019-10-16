@@ -43,7 +43,16 @@ class MainFragment : Fragment() {
         recycler_view_images.apply{
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
         }
-        adapter = ImageRecyclerAdapter()
+        adapter = ImageRecyclerAdapter(object: ImageRecyclerAdapter.OnClickListeners{
+            override fun onDeleteClickListener(position: Int) {
+                viewModel.removeImageAt(position)
+            }
+
+            override fun onImageClickListener(position: Int) {
+                viewModel.setCurrentDisplayedImagePosition(position)
+            }
+
+        })
         binding.recyclerViewImages.adapter = adapter
 
     }

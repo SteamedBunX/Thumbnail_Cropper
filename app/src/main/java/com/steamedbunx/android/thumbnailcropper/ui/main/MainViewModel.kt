@@ -28,6 +28,21 @@ class MainViewModel : ViewModel() {
         _currentImage.value = uri
     }
 
+    fun setCurrentDisplayedImagePosition(position: Int){
+        _currentImage.value = imageArrayList.get(position)?.uri
+    }
+
+    fun removeImageAt(position: Int){
+        if(_currentImage.value == imageArrayList.get(position).uri)
+        {
+            _currentImage.value = null
+        }
+        util.deleteImage(imageArrayList.get(position).uri)
+        imageArrayList.removeAt(position)
+        _imageList.value = imageArrayList
+
+    }
+
     fun updateImageList(context: Context) {
         var allUri: List<Uri> = util.loadAllPngUriFromInternalStorage(context)
         for (uri in allUri) {
@@ -37,7 +52,7 @@ class MainViewModel : ViewModel() {
             }
             Log.i("ITEM_LOADING", uri.path)
         }
-        _imageList.value = imageArrayList.toList()
+        _imageList.value = imageArrayList
     }
 
 

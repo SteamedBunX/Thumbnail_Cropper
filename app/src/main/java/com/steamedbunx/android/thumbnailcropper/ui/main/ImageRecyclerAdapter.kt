@@ -13,12 +13,12 @@ import com.steamedbunx.android.thumbnailcropper.R
 import com.steamedbunx.android.thumbnailcropper.databinding.ImageListItemBinding
 import kotlinx.android.synthetic.main.image_list_item.view.*
 
-class ImageRecyclerAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class ImageRecyclerAdapter(val onClickListners: OnClickListeners) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var items: List<ImageModel> = ArrayList<ImageModel>()
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return ImageModelViewHolder(LayoutInflater.from(parent.context)
-            .inflate(R.layout.image_list_item,parent, false))
+            .inflate(R.layout.image_list_item,parent, false), onClickListners)
     }
 
     override fun getItemCount(): Int {
@@ -38,14 +38,22 @@ class ImageRecyclerAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     class ImageModelViewHolder constructor(
-        itemView: View
-    ) : RecyclerView.ViewHolder(itemView) {
+        itemView: View, val onClickListners: OnClickListeners
+    ) : RecyclerView.ViewHolder(itemView){
+
         val imageThumbnail = itemView.image_thumbnail
         val buttonDelete = itemView.button_delete
 
         fun bind(imageModel: ImageModel){
             imageThumbnail.setImageBitmap(imageModel.bitmap)
+            itemView.setOnClickListener { onClickListners.onImageClickListener(adapterPosition) }
+            buttonDelete.setOnClickListener { onClickListners.onDeleteClickListener(adapterPosition) }
         }
+    }
+
+    interface OnClickListeners{
+        fun onDeleteClickListener(position: Int)
+        fun onImageClickListener(position: Int)
     }
 
 }
