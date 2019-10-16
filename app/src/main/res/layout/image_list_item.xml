@@ -40,13 +40,15 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <Button
+            <ImageButton
                 android:id="@+id/button_delete"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_margin="10dp"
-                android:background="@drawable/ic_delete"
-                android:backgroundTint="@color/colorTextPrimary"
+                android:background="@color/colorButtonPrimary"
+                android:elevation="5dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_delete"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"

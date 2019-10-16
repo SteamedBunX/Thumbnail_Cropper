@@ -1,8 +1,10 @@
 package com.steamedbunx.android.thumbnailcropper.ui.main
 
+import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import androidx.core.net.toFile
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -40,7 +42,6 @@ class MainViewModel : ViewModel() {
         util.deleteImage(imageArrayList.get(position).uri)
         imageArrayList.removeAt(position)
         _imageList.value = imageArrayList
-
     }
 
     fun updateImageList(context: Context) {
@@ -50,10 +51,16 @@ class MainViewModel : ViewModel() {
                 imageArrayList.add(ImageModel(uri, util.getBitmapFromUri(uri, context)))
 
             }
-            Log.i("ITEM_LOADING", uri.path)
         }
         _imageList.value = imageArrayList
     }
 
+    fun storeImageToGallery(context: Context){
+        val uri = currentImage.value
+        if(uri != null) {
+            util.storeImageToGallery(context, uri)
+            Log.i("IMAGE_STORE", "Attempting To Store the Image")
+        }
+    }
 
 }

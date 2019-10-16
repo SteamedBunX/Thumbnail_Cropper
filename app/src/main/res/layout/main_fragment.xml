@@ -61,5 +61,24 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/guideline"
             app:layout_constraintVertical_bias="0.428" />
+
+        <ImageButton
+            android:id="@+id/button_save"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_margin="20dp"
+            android:height="50dp"
+            android:background="@color/colorButtonPrimary"
+            android:contentDescription="Button to save image"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_save"
+            android:text="Button"
+            app:layout_constraintBottom_toTopOf="@+id/recycler_view_images"
+            app:layout_constraintDimensionRatio="1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/button_load_new_image"
+            app:layout_constraintTop_toBottomOf="@+id/imageView" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

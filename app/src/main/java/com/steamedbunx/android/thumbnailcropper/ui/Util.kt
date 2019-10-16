@@ -5,9 +5,11 @@ import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import androidx.core.net.toFile
-import com.steamedbunx.android.thumbnailcropper.ui.main.ImageModel
+import com.google.android.material.snackbar.Snackbar
 import java.io.File
 import java.io.FileFilter
 import java.io.FileOutputStream
@@ -76,5 +78,24 @@ class Util private constructor() {
 
     fun deleteImage(uri: Uri){
         uri.toFile().delete()
+    }
+
+    fun storeImageToGallery(context: Context, uri:Uri){
+        val root = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString()
+        val myDir = File("$root/Saved_Images_From_Cropper")
+        myDir.mkdirs()
+        val file = File(myDir, createFileName())
+        if (file.exists())
+            file.delete()
+        try {
+            val outputStream = FileOutputStream(file)
+            val outputBitmap = getBitmapFromUri(uri, context)
+            outputBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+            outputStream.flush()
+            outputStream.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
     }
 }
